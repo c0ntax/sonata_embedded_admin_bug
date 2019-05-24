@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -17,42 +18,116 @@ class Container
     private $id;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @var Flags
+     *
+     * @ORM\OneToOne(targetEntity="App\Entity\Flags", cascade={"persist", "remove"})
      */
-    private $propertyOne = true;
+    private $flags;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Child", inversedBy="container", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
+     * @var ArrayCollection|Flags[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Flags", cascade={"persist", "remove"}, mappedBy="container")
      */
-    private $child;
+    private $flagsCollection;
+
+    /**
+     * @var ArrayCollection|SubContainer[]
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\SubContainer", cascade={"persist", "remove"}, mappedBy="container")
+     */
+    private $subContainerCollection;
+
+    public function __construct()
+    {
+        $this->flagsCollection = new ArrayCollection();
+        $this->subContainerCollection = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPropertyOne(): ?bool
+    public function getFlags(): ?Flags
     {
-        return $this->propertyOne;
+        return $this->flags;
     }
 
-    public function setPropertyOne(bool $propertyOne): self
+    public function setFlags(?Flags $flags): self
     {
-        $this->propertyOne = $propertyOne;
+        $this->flags = $flags;
 
         return $this;
     }
 
-    public function getChild(): ?Child
+    /**
+     * @return Flags[]|ArrayCollection
+     */
+    public function getFlagsCollection()
     {
-        return $this->child;
+        return $this->flagsCollection;
     }
 
-    public function setChild(Child $child): self
+    /**
+     * @param Flags[]|ArrayCollection $flagsCollection
+     * @return Container
+     */
+    public function setFlagsCollection($flagsCollection)
     {
-        $this->child = $child;
+        $this->flagsCollection = $flagsCollection;
 
         return $this;
+    }
+
+    /**
+     * @param Flags $flagsCollection
+     */
+    public function addFlagsCollection(Flags $flagsCollection)
+    {
+        $this->flagsCollection->add($flagsCollection);
+    }
+
+    /**
+     * @param Flags $flagsCollection
+     */
+    public function removeFlagsCollection(Flags $flagsCollection)
+    {
+        $this->flagsCollection->removeElement($flagsCollection);
+    }
+
+    /**
+     * @return SubContainer[]|ArrayCollection
+     */
+    public function getSubContainerCollection()
+    {
+        return $this->subContainerCollection;
+    }
+
+    /**
+     * @param SubContainer[]|ArrayCollection $subContainerCollection
+     * @return Container
+     */
+    public function setSubContainerCollection($subContainerCollection)
+    {
+        $this->subContainerCollection = $subContainerCollection;
+
+        return $this;
+    }
+
+    /**
+     * @param SubContainer $subContainerCollection
+     */
+    public function addSubContainerCollection(SubContainer $subContainerCollection)
+    {
+        $this->subContainerCollection->add($subContainerCollection);
+    }
+
+    /**
+     * @param SubContainer $subContainerCollection
+     */
+    public function removeSubContainerCollection(SubContainer $subContainerCollection)
+    {
+        $this->subContainerCollection->removeElement($subContainerCollection);
     }
 }
